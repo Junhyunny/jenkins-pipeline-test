@@ -1,13 +1,6 @@
 pipeline {
     agent any
     stages {
-        stage('checkout') {
-            steps {
-                git branch: 'main',
-                credentialsId: 'github_access_token',
-                url: 'https://github.com/Junhyunny/jenkins-pipeline-test.git'
-            }
-        }
         stage('tests') {
             parallel {
                 stage('backend test') {
