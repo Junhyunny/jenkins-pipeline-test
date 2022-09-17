@@ -1,0 +1,47 @@
+pipeline {
+    agent any
+    stages {
+        stage('checkout') {
+            steps {
+                git branch: 'main',
+                credentialsId: 'github_access_token',
+                url: 'https://github.com/Junhyunny/jenkins-github-webhook.git'
+            }
+        }
+        stage('tests') {
+            parallel {
+                stage('unit test') {
+                    dir('backend') {
+                        steps {
+                            sh 'mvn test'
+                        }
+                    }
+                }
+                stage('integration test') {
+                    steps {
+                        dir('backend') {
+                            steps {
+                                sh 'mvn verify -Dskip.unit.tests=true'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        stage('build') {
+            steps {
+                dir('backend') {
+                    sh 'docker build -t backend .'
+                }
+            }
+        }
+        stage('restart container') {
+            steps {
+                dir('backend') {
+                    sh 'docker stop backend || true && docker rm backend || true'
+                    sh 'docker run -d -p 8081:8080 --name backend backend'
+                }
+            }
+        }
+    }
+}
