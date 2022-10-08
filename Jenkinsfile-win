@@ -1,0 +1,33 @@
+pipeline {
+    agent any
+    stages {
+        stage('tests') {
+            parallel {
+                stage('backend test') {
+                    steps {
+                        dir('backend') {
+                            bat 'mvn verify'
+                        }
+                    }
+                }
+                stage('frontend test') {
+                    steps {
+                        dir('frontend') {
+                            bat 'npm install && npm test'
+                        }
+                    }
+                }
+            }
+        }
+        stage('build') {
+            steps {
+                bat 'docker-compose down && docker-compose build'
+            }
+        }
+        stage('deploy') {
+            steps {
+                bat 'docker-compose up -d'
+            }
+        }
+    }
+}
