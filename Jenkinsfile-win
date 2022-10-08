@@ -6,7 +6,7 @@ pipeline {
                 stage('backend test') {
                     steps {
                         dir('backend') {
-                            bat 'mvn.bat verify'
+                            bat 'mvn verify'
                         }
                     }
                 }
